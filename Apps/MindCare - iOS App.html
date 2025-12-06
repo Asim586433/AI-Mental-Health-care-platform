@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MindCare - iOS App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        body {
+            background: #f5f9fc;
+            color: #1a1a1a;
+            max-width: 414px;
+            margin: 0 auto;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* iOS Status Bar */
+        .status-bar {
+            background: #ffffff;
+            padding: 15px 20px 5px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #000;
+            border-bottom: 1px solid #e5e5ea;
+        }
+        
+        /* Safe Area for iPhone Notch */
+        .safe-area {
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        
+        /* Navigation Header */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 22px;
+            font-weight: 600;
+        }
+        
+        .profile-icon {
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: 20px;
+        }
+        
+        /* Welcome Section */
+        .welcome-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        
+        .welcome-card h2 {
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 20px;
+        }
+        
+        .welcome-card p {
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        
+        /* Mood Tracker */
+        .mood-tracker {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        
+        .mood-tracker h3 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 18px;
+        }
+        
+        .mood-options {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .mood-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 25px;
+            border: none;
+            background: #f0f4f8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .mood-btn:hover, .mood-btn.active {
+            transform: scale(1.1);
+            background: #667eea;
+            color: white;
+        }
+        
+        /* AI Chat Interface */
+        .ai-chat {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        
+        .ai-chat h3 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 18px;
+        }
+        
+        .chat-container {
+            height: 200px;
+            overflow-y: auto;
+            border: 1px solid #e5e5ea;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 15px;
+            background: #fafafa;
+        }
+        
+        .message {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 15px;
+            max-width: 80%;
+        }
+        
+        .ai-message {
+            background: #e3f2fd;
+            align-self: flex-start;
+        }
+        
+        .user-message {
+            background: #667eea;
+            color: white;
+            margin-left: auto;
+        }
+        
+        .chat-input {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #e5e5ea;
+            border-radius: 20px;
+            font-size: 16px;
+        }
+        
+        .send-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .action-btn {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: transform 0.2s;
+            border: none;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .action-btn .icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: #667eea;
+        }
+        
+        /* Bottom Tab Bar (iOS Style) */
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e5e5ea;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            max-width: 414px;
+            margin: 0 auto;
+        }
+        
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #8e8e93;
+            font-size: 12px;
+            cursor: pointer;
+            padding: 5px;
+            border: none;
+            background: none;
+        }
+        
+        .tab-item.active {
+            color: #667eea;
+        }
+        
+        .tab-item .icon {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+        
+        /* Breathing Exercise */
+        .breathing-exercise {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 25px;
+            text-align: center;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .breath-circle {
+            width: 150px;
+            height: 150px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            animation: breathe 8s infinite;
+        }
+        
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.5); }
+        }
+        
+        /* Progress Tracking */
+        .progress-section {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 80px;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: #e5e5ea;
+            border-radius: 4px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #4cd964;
+            width: 65%;
+            border-radius: 4px;
+        }
+        
+        /* Emergency Button */
+        .emergency-btn {
+            position: fixed;
+            bottom: 70px;
+            right: 20px;
+            background: #ff3b30;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(255,59,48,0.3);
+            cursor: pointer;
+            border: none;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+    <div class="safe-area">
+        <!-- iOS Status Bar -->
+        <div class="status-bar">
+            <span>9:41</span>
+            <span>📶 100% 🔋</span>
+        </div>
+        
+        <!-- Main Header -->
+        <div class="header">
+            <h1>MindCare</h1>
+            <div class="profile-icon" onclick="openProfile()">👤</div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Welcome Card -->
+            <div class="welcome-card">
+                <h2>Welcome back, Alex 👋</h2>
+                <p>How are you feeling today? Track your mood and let's work on your mental wellness together.</p>
+                <button class="action-btn" onclick="startCheckIn()">
+                    <div class="icon">📝</div>
+                    Daily Check-in
+                </button>
+            </div>
+            
+            <!-- Mood Tracker -->
+            <div class="mood-tracker">
+                <h3>Current Mood</h3>
+                <div class="mood-options">
+                    <button class="mood-btn" onclick="selectMood('😢')">😢</button>
+                    <button class="mood-btn" onclick="selectMood('😔')">😔</button>
+                    <button class="mood-btn" onclick="selectMood('😐')">😐</button>
+                    <button class="mood-btn" onclick="selectMood('🙂')">🙂</button>
+                    <button class="mood-btn" onclick="selectMood('😊')">😊</button>
+                </div>
+                <div id="mood-feedback"></div>
+            </div>
+            
+            <!-- AI Chat Assistant -->
+            <div class="ai-chat">
+                <h3>AI Wellness Assistant</h3>
+                <div class="chat-container" id="chat-container">
+                    <div class="message ai-message">Hello! I'm your AI mental health assistant. How can I support you today?</div>
+                </div>
+                <div class="chat-input">
+                    <input type="text" id="message-input" placeholder="Type your message..." onkeypress="handleKeyPress(event)">
+                    <button class="send-btn" onclick="sendMessage()">➤</button>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <button class="action-btn" onclick="startBreathing()">
+                    <div class="icon">🌬️</div>
+                    Breathing Exercise
+                </button>
+                <button class="action-btn" onclick="showMeditations()">
+                    <div class="icon">🧘</div>
+                    Guided Meditation
+                </button>
+                <button class="action-btn" onclick="showJournal()">
+                    <div class="icon">📓</div>
+                    Daily Journal
+                </button>
+                <button class="action-btn" onclick="showProgress()">
+                    <div class="icon">📊</div>
+                    Progress Insights
+                </button>
+            </div>
+            
+            <!-- Breathing Exercise (Hidden by default) -->
+            <div class="breathing-exercise" id="breathing-exercise">
+                <h3>Calming Breath Exercise</h3>
+                <p>Follow the circle's rhythm</p>
+                <div class="breath-circle" id="breath-circle">Breathe In</div>
+                <p>Inhale as it expands, exhale as it contracts</p>
+                <button class="action-btn" onclick="stopBreathing()" style="background: white; color: #667eea;">Stop Exercise</button>
+            </div>
+            
+            <!-- Progress Tracking -->
+            <div class="progress-section">
+                <h3>Weekly Wellness Progress</h3>
+                <p>You've completed 5/7 daily check-ins this week</p>
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+                <button class="action-btn" onclick="showDetailedProgress()">
+                    <div class="icon">📈</div>
+                    View Detailed Insights
+                </button>
+            </div>
+        </div>
+        
+        <!-- Emergency Button -->
+        <button class="emergency-btn" onclick="showEmergencyOptions()">🆘</button>
+        
+        <!-- iOS Style Tab Bar -->
+        <div class="tab-bar">
+            <button class="tab-item active" onclick="switchTab('home')">
+                <div class="icon">🏠</div>
+                Home
+            </button>
+            <button class="tab-item" onclick="switchTab('therapy')">
+                <div class="icon">💬</div>
+                Therapy
+            </button>
+            <button class="tab-item" onclick="switchTab('resources')">
+                <div class="icon">📚</div>
+                Resources
+            </button>
+            <button class="tab-item" onclick="switchTab('profile')">
+                <div class="icon">⚙️</div>
+                Settings
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Mood Selection
+        let selectedMood = '';
+        
+        function selectMood(mood) {
+            selectedMood = mood;
+            document.querySelectorAll('.mood-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            const feedback = document.getElementById('mood-feedback');
+            const messages = {
+                '😢': "I'm here for you. Would you like to talk about what's bothering you?",
+                '😔': "It's okay to feel down sometimes. Try our breathing exercise.",
+                '😐': "Thanks for checking in. Want to explore some mindfulness exercises?",
+                '🙂': "Glad you're doing okay! Keep up the good work.",
+                '😊': "Wonderful! Your positive energy is contagious!"
+            };
+            
+            feedback.innerHTML = `<p style="color: #667eea; margin-top: 10px;">${messages[mood]}</p>`;
+        }
+        
+        // AI Chat Functions
+        function sendMessage() {
+            const input = document.getElementById('message-input');
+            const message = input.value.trim();
+            
+            if (message) {
+                const chatContainer = document.getElementById('chat-container');
+                
+                // Add user message
+                const userMessage = document.createElement('div');
+                userMessage.className = 'message user-message';
+                userMessage.textContent = message;
+                chatContainer.appendChild(userMessage);
+                
+                // Clear input
+                input.value = '';
+                
+                // Simulate AI response
+                setTimeout(() => {
+                    const aiResponse = getAIResponse(message);
+                    const aiMessage = document.createElement('div');
+                    aiMessage.className = 'message ai-message';
+                    aiMessage.textContent = aiResponse;
+                    chatContainer.appendChild(aiMessage);
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                }, 1000);
+                
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+        }
+        
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+        
+        function getAIResponse(message) {
+            const responses = [
+                "I understand. How has that been affecting your daily routine?",
+                "That's completely valid. Would you like to try a quick mindfulness exercise?",
+                "Thank you for sharing. I'm here to listen and support you.",
+                "Let's work through this together. What's one small step you could take today?",
+                "Remember to be kind to yourself. Progress takes time.",
+                "Would you like me to suggest some coping strategies for that?"
+            ];
+            return responses[Math.floor(Math.random() * responses.length)];
+        }
+        
+        // Breathing Exercise
+        let breathInterval;
+        let isBreathing = false;
+        
+        function startBreathing() {
+            document.getElementById('breathing-exercise').style.display = 'block';
+            document.querySelector('.main-content').scrollIntoView({behavior: 'smooth'});
+            
+            const circle = document.getElementById('breath-circle');
+            let isInhale = true;
+            let count = 0;
+            
+            breathInterval = setInterval(() => {
+                if (isInhale) {
+                    circle.textContent = 'Breathe In';
+                    circle.style.animation = 'breathe 4s ease-in-out infinite';
+                } else {
+                    circle.textContent = 'Breathe Out';
+                    circle.style.animation = 'breathe 4s ease-in-out infinite reverse';
+                }
+                isInhale = !isInhale;
+                count++;
+                
+                if (count >= 6) { // Stop after 3 cycles
+                    stopBreathing();
+                }
+            }, 4000);
+            
+            isBreathing = true;
+        }
+        
+        function stopBreathing() {
+            clearInterval(breathInterval);
+            document.getElementById('breathing-exercise').style.display = 'none';
+            isBreathing = false;
+        }
+        
+        // Tab Navigation
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            alert(`Switching to ${tab} tab - In full app, this would load ${tab} content`);
+        }
+        
+        // Emergency Button
+        function showEmergencyOptions() {
+            if (confirm('Emergency Resources:\n\n1. Crisis Hotline: 988\n2. Text HOME to 741741\n3. Contact Trusted Person\n\nOpen Emergency Contacts?')) {
+                alert('Opening emergency contacts...');
+            }
+        }
+        
+        // Other Functions
+        function openProfile() {
+            alert('Opening profile settings...');
+        }
+        
+        function startCheckIn() {
+            alert('Starting daily mental health check-in...');
+        }
+        
+        function showMeditations() {
+            alert('Opening guided meditation library...');
+        }
+        
+        function showJournal() {
+            alert('Opening daily journal...');
+        }
+        
+        function showProgress() {
+            alert('Showing detailed progress insights...');
+        }
+        
+        function showDetailedProgress() {
+            alert('Opening detailed progress analytics...');
+        }
+        
+        // Initialize with default mood
+        window.onload = function() {
+            selectMood('🙂');
+        };
+    </script>
+</body>
+</html>

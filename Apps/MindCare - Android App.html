@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MindCare - Android App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', 'Segoe UI', sans-serif;
+        }
+        
+        body {
+            background: #f8f9fa;
+            color: #202124;
+            max-width: 414px;
+            margin: 0 auto;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Android Status Bar */
+        .status-bar {
+            background: #6200ee;
+            color: white;
+            padding: 15px 20px 5px;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        /* Material Design Header */
+        .header {
+            background: #6200ee;
+            color: white;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .app-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .app-title {
+            font-size: 24px;
+            font-weight: 500;
+        }
+        
+        .material-icons {
+            font-family: 'Material Icons';
+            font-size: 24px;
+        }
+        
+        /* FAB Button */
+        .fab {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            background: #6200ee;
+            color: white;
+            border-radius: 28px;
+            border: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+        
+        /* Cards (Material Design) */
+        .card {
+            background: white;
+            border-radius: 8px;
+            margin: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            color: #202124;
+        }
+        
+        /* Mood Grid */
+        .mood-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin: 15px 0;
+        }
+        
+        .mood-card {
+            background: #f5f5f5;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+        
+        .mood-card:hover, .mood-card.active {
+            background: #e3f2fd;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .mood-emoji {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+        
+        /* Progress Cards */
+        .progress-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 15px 0;
+        }
+        
+        .progress-card {
+            background: linear-gradient(135deg, #bb86fc 0%, #6200ee 100%);
+            color: white;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .progress-number {
+            font-size: 28px;
+            font-weight: 500;
+            margin: 5px 0;
+        }
+        
+        /* AI Chat Container */
+        .chat-container {
+            height: 250px;
+            overflow-y: auto;
+            margin: 15px 0;
+            padding: 10px;
+            background: #fafafa;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .message-bubble {
+            margin: 8px 0;
+            padding: 12px 16px;
+            border-radius: 20px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        
+        .ai-bubble {
+            background: #e3f2fd;
+            border-bottom-left-radius: 4px;
+        }
+        
+        .user-bubble {
+            background: #6200ee;
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+        }
+        
+        /* Input with Send Button */
+        .input-with-button {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .input-field {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 24px;
+            font-size: 16px;
+            background: white;
+        }
+        
+        .send-button {
+            background: #6200ee;
+            color: white;
+            border: none;
+            width: 48px;
+            height: 48px;
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            max-width: 414px;
+            margin: 0 auto;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #757575;
+            font-size: 12px;
+            cursor: pointer;
+            padding: 8px;
+            border: none;
+            background: none;
+            flex: 1;
+        }
+        
+        .nav-item.active {
+            color: #6200ee;
+        }
+        
+        .nav-icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+        
+        /* Exercise Cards */
+        .exercise-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 15px 0;
+        }
+        
+        .exercise-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .exercise-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        /* Emergency Modal */
+        .emergency-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 320px;
+            width: 90%;
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        /* Chip Elements */
+        .chip-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 15px 0;
+        }
+        
+        .chip {
+            background: #e3f2fd;
+            padding: 8px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .chip:hover {
+            background: #bbdefb;
+        }
+    </style>
+</head>
+<body>
+    <!-- Android Status Bar -->
+    <div class="status-bar">
+        <span>9:41</span>
+        <span>📶 100% 🔋</span>
+    </div>
+    
+    <!-- Material Design Header -->
+    <div class="header">
+        <div class="app-bar">
+            <div class="app-title">MindCare</div>
+            <button style="background:none;border:none;color:white;font-size:24px" onclick="openNotifications()">🔔</button>
+        </div>
+        
+        <div style="font-size: 14px; opacity: 0.9;">
+            Hello, Michael • Day 12 of your wellness journey
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div style="margin-bottom: 80px;">
+        <!-- Quick Stats Card -->
+        <div class="card">
+            <div class="card-title">Today's Overview</div>
+            <div class="progress-cards">
+                <div class="progress-card">
+                    <div>Mood Score</div>
+                    <div class="progress-number">7.8</div>
+                    <div>+0.5 from yesterday</div>
+                </div>
+                <div class="progress-card">
+                    <div>Meditation</div>
+                    <div class="progress-number">15m</div>
+                    <div>Daily goal achieved</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mood Tracker Card -->
+        <div class="card">
+            <div class="card-title">How are you feeling?</div>
+            <div class="mood-grid">
+                <button class="mood-card" onclick="logMood('anxious')">
+                    <div class="mood-emoji">😰</div>
+                    <div>Anxious</div>
+                </button>
+                <button class="mood-card" onclick="logMood('sad')">
+                    <div class="mood-emoji">😔</div>
+                    <div>Sad</div>
+                </button>
+                <button class="mood-card" onclick="logMood('neutral')">
+                    <div class="mood-emoji">😐</div>
+                    <div>Neutral</div>
+                </button>
+                <button class="mood-card" onclick="logMood('calm')">
+                    <div class="mood-emoji">😌</div>
+                    <div>Calm</div>
+                </button>
+                <button class="mood-card" onclick="logMood('happy')">
+                    <div class="mood-emoji">😊</div>
+                    <div>Happy</div>
+                </button>
+                <button class="mood-card" onclick="logMood('energetic')">
+                    <div class="mood-emoji">😄</div>
+                    <div>Energetic</div>
+                </button>
+            </div>
+            <div id="mood-response" style="color: #6200ee; margin-top: 10px;"></div>
+        </div>
+        
+        <!-- AI Assistant Card -->
+        <div class="card">
+            <div class="card-title">AI Wellness Assistant</div>
+            <div class="chat-container" id="android-chat">
+                <div class="message-bubble ai-bubble">
+                    Hi there! I'm here to support your mental wellness journey. How can I help you today?
+                </div>
+            </div>
+            <div class="input-with-button">
+                <input type="text" class="input-field" id="android-input" placeholder="Type your thoughts..." onkeypress="androidKeyPress(event)">
+                <button class="send-button" onclick="androidSendMessage()">➤</button>
+            </div>
+            
+            <!-- Quick Suggestions -->
+            <div class="chip-container">
+                <div class="chip" onclick="suggestMessage('I feel stressed today')">I feel stressed</div>
+                <div class="chip" onclick="suggestMessage('Suggest a quick exercise')">Quick exercise</div>
+                <div class="chip" onclick="suggestMessage('Help me relax')">Help me relax</div>
+            </div>
+        </div>
+        
+        <!-- Exercises Card -->
+        <div class="card">
+            <div class="card-title">Quick Wellness Exercises</div>
+            <div class="exercise-cards">
+                <div class="exercise-card" onclick="startExercise('breathing')">
+                    <div style="font-size: 32px; margin-bottom: 10px;">🌬️</div>
+                    <div style="font-weight: 500;">Deep Breathing</div>
+                    <div style="font-size: 12px; color: #666;">5 mins • Calming</div>
+                </div>
+                <div class="exercise-card" onclick="startExercise('gratitude')">
+                    <div style="font-size: 32px; margin-bottom: 10px;">🙏</div>
+                    <div style="font-weight: 500;">Gratitude Journal</div>
+                    <div style="font-size: 12px; color: #666;">3 mins • Positive</div>
+                </div>
+                <div class="exercise-card" onclick="startExercise('meditation')">
+                    <div style="font-size: 32px; margin-bottom: 10px;">🧘</div>
+                    <div style="font-weight: 500;">Guided Meditation</div>
+                    <div style="font-size: 12px; color: #666;">10 mins • Focus</div>
+                </div>
+                <div class="exercise-card" onclick="startExercise('walk')">
+                    <div style="font-size: 32px; margin-bottom: 10px;">🚶</div>
+                    <div style="font-weight: 500;">Mindful Walk</div>
+                    <div style="font-size: 12px; color: #666;">15 mins • Active</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Progress Insights -->
+        <div class="card">
+            <div class="card-title">Weekly Insights</div>
+            <div style="margin: 15px 0;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span>Stress Levels</span>
+                    <span>↓ 15%</span>
+                </div>
+                <div style="height: 8px; background: #e0e0e0; border-radius: 4px; overflow: hidden;">
+                    <div style="width: 60%; height: 100%; background: #4caf50;"></div>
+                </div>
+            </div>
+            <div style="margin: 15px 0;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span>Sleep Quality</span>
+                    <span>↑ 20%</span>
+                </div>
+                <div style="height: 8px; background: #e0e0e0; border-radius: 4px; overflow: hidden;">
+                    <div style="width: 75%; height: 100%; background: #2196f3;"></div>
+                </div>
+            </div>
+            <button class="send-button" onclick="showDetailedInsights()" style="width: 100%; margin-top: 10px;">
+                View Full Report
+            </button>
+        </div>
+    </div>
+    
+    <!-- Floating Action Button -->
+    <button class="fab" onclick="openEmergencyModal()">🆘</button>
+    
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <button class="nav-item active" onclick="navigateTo('home')">
+            <div class="nav-icon">🏠</div>
+            <div>Home</div>
+        </button>
+        <button class="nav-item" onclick="navigateTo('sessions')">
+            <div class="nav-icon">💬</div>
+            <div>Sessions</div>
+        </button>
+        <button class="nav-item" onclick="navigateTo('tools')">
+            <div class="nav-icon">🛠️</div>
+            <div>Tools</div>
+        </button>
+        <button class="nav-item" onclick="navigateTo('profile')">
+            <div class="nav-icon">👤</div>
+            <div>Profile</div>
+        </button>
+    </div>
+    
+    <!-- Emergency Modal -->
+    <div class="emergency-modal" id="emergencyModal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 20px; color: #d32f2f;">🆘 Emergency Support</h3>
+            <div style="margin-bottom: 20px;">
+                <div style="background: #ffebee; padding: 12px; border-radius: 8px; margin-bottom: 10px; cursor: pointer;" onclick="callEmergency('988')">
+                    <strong>National Suicide Prevention Lifeline</strong>
+                    <div>Call 988</div>
+                </div>
+                <div style="background: #f3e5f5; padding: 12px; border-radius: 8px; margin-bottom: 10px; cursor: pointer;" onclick="textEmergency('741741')">
+                    <strong>Crisis Text Line</strong>
+                    <div>Text HOME to 741741</div>
+                </div>
+                <div style="background: #e8f5e9; padding: 12px; border-radius: 8px; cursor: pointer;" onclick="showEmergencyContacts()">
+                    <strong>Emergency Contacts</strong>
+                    <div>Your trusted contacts</div>
+                </div>
+            </div>
+            <button onclick="closeEmergencyModal()" style="background: #6200ee; color: white; border: none; padding: 12px 24px; border-radius: 4px; width: 100%; cursor: pointer;">
+                Close
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Mood Tracking
+        function logMood(mood) {
+            document.querySelectorAll('.mood-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            const responses = {
+                'anxious': "I notice you're feeling anxious. Try the deep breathing exercise for quick relief.",
+                'sad': "It's okay to feel sad. Would you like to talk about what's on your mind?",
+                'neutral': "Thanks for checking in. Mindfulness can help improve your day.",
+                'calm': "Great to hear you're feeling calm! Keep up the good work.",
+                'happy': "Wonderful! Your positive mood is inspiring.",
+                'energetic': "Fantastic energy! Channel it into something positive today."
+            };
+            
+            document.getElementById('mood-response').textContent = responses[mood];
+            logActivity(`Mood logged: ${mood}`);
+        }
+        
+        // AI Chat Functions
+        function androidSendMessage() {
+            const input = document.getElementById('android-input');
+            const message = input.value.trim();
+            
+            if (message) {
+                const chat = document.getElementById('android-chat');
+                
+                // User message
+                const userBubble = document.createElement('div');
+                userBubble.className = 'message-bubble user-bubble';
+                userBubble.textContent = message;
+                chat.appendChild(userBubble);
+                
+                input.value = '';
+                
+                // AI response
+                setTimeout(() => {
+                    const aiBubble = document.createElement('div');
+                    aiBubble.className = 'message-bubble ai-bubble';
+                    aiBubble.textContent = generateAIResponse(message);
+                    chat.appendChild(aiBubble);
+                    chat.scrollTop = chat.scrollHeight;
+                }, 1000);
+                
+                chat.scrollTop = chat.scrollHeight;
+            }
+        }
+        
+        function androidKeyPress(event) {
+            if (event.key === 'Enter') {
+                androidSendMessage();
+            }
+        }
+        
+        function suggestMessage(text) {
+            document.getElementById('android-input').value = text;
+            androidSendMessage();
+        }
+        
+        function generateAIResponse(message) {
+            const responses = [
+                "I hear you. Let's work through this together. What's one small thing that might help?",
+                "Thank you for sharing that. How has this been affecting your week?",
+                "I understand. Would you like to try a quick mindfulness exercise?",
+                "That's completely valid. Remember to practice self-compassion.",
+                "Let's explore some coping strategies for that feeling.",
+                "I'm here to support you. What would be most helpful right now?"
+            ];
+            return responses[Math.floor(Math.random() * responses.length)];
+        }
+        
+        // Exercise Functions
+        function startExercise(type) {
+            const exercises = {
+                'breathing': 'Starting 5-minute deep breathing exercise...',
+                'gratitude': 'Opening gratitude journal... Write 3 things you\'re thankful for.',
+                'meditation': 'Beginning 10-minute guided meditation... Find a comfortable position.',
+                'walk': 'Time for a mindful walk! Notice your surroundings as you walk.'
+            };
+            alert(exercises[type]);
+            logActivity(`Started exercise: ${type}`);
+        }
+        
+        // Navigation
+        function navigateTo(page) {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            if (page !== 'home') {
+                alert(`Navigating to ${page} - In full app, this would load ${page} screen`);
+            }
+        }
+        
+        // Emergency Functions
+        function openEmergencyModal() {
+            document.getElementById('emergencyModal').style.display = 'flex';
+        }
+        
+        function closeEmergencyModal() {
+            document.getElementById('emergencyModal').style.display = 'none';
+        }
+        
+        function callEmergency(number) {
+            alert(`Calling emergency number: ${number}\n\nIn the real app, this would initiate a phone call.`);
+        }
+        
+        function textEmergency(number) {
+            alert(`Opening text to: ${number}\n\nIn the real app, this would open your messaging app.`);
+        }
+        
+        function showEmergencyContacts() {
+            alert('Showing your saved emergency contacts...');
+        }
+        
+        // Utility Functions
+        function openNotifications() {
+            alert('Opening notifications...');
+        }
+        
+        function showDetailedInsights() {
+            alert('Opening detailed wellness insights and analytics...');
+        }
+        
+        function logActivity(activity) {
+            console.log(`[Activity Log] ${activity}`);
+        }
+        
+        // Initialize
+        window.onload = function() {
+            logActivity('App initialized');
+        };
+    </script>
+</body>
+</html>
