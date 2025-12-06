@@ -1,0 +1,2285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindCare | Complete AI Mental Health Platform</title>
+    <style>
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a67d8;
+            --secondary: #764ba2;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --light: #f8fafc;
+            --dark: #1f2937;
+            --gray: #6b7280;
+            --border-radius: 12px;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Authentication Screens */
+        .auth-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: white;
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .auth-container.active {
+            display: flex;
+        }
+
+        .auth-box {
+            background: white;
+            padding: 3rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            max-width: 400px;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Main App Container */
+        .app-container {
+            display: none;
+        }
+
+        .app-container.active {
+            display: block;
+        }
+
+        /* Header */
+        header {
+            background: white;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            cursor: pointer;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .user-menu {
+            position: relative;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .user-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            min-width: 200px;
+            padding: 0.5rem 0;
+            z-index: 1001;
+        }
+
+        .user-dropdown.active {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .dropdown-item:hover {
+            background: var(--light);
+        }
+
+        /* Main Layout */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        /* Mood Tracker */
+        .mood-scale {
+            display: flex;
+            justify-content: space-between;
+            margin: 1.5rem 0;
+            gap: 0.5rem;
+        }
+
+        .mood-option {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        .mood-option:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+        }
+
+        .mood-option.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            transform: translateY(-5px);
+        }
+
+        .mood-emoji {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* AI Chat */
+        .chat-container {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #e5e7eb;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: var(--light);
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            max-width: 80%;
+        }
+
+        .message.user {
+            margin-left: auto;
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+
+        .message-content {
+            background: white;
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            box-shadow: var(--shadow);
+        }
+
+        .message.user .message-content {
+            background: var(--primary);
+            color: white;
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* Progress Visualization */
+        .progress-bar {
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 4px;
+            transition: width 1s ease;
+        }
+
+        /* Journal Editor */
+        .journal-editor {
+            width: 100%;
+            min-height: 200px;
+            padding: 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            transition: var(--transition);
+        }
+
+        .journal-editor:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* Exercises */
+        .exercises-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .exercise-card {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        .exercise-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .exercise-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Breathing Exercise */
+        .breathing-exercise {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .breathing-exercise.active {
+            display: block;
+        }
+
+        .breath-circle {
+            width: 200px;
+            height: 200px;
+            margin: 2rem auto;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 600;
+            animation: breathe 8s infinite ease-in-out;
+        }
+
+        @keyframes breathe {
+            0%, 100% { 
+                transform: scale(1);
+                background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            }
+            50% { 
+                transform: scale(1.5);
+                background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            }
+        }
+
+        /* Emergency Modal */
+        .emergency-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .emergency-modal.active {
+            display: flex;
+        }
+
+        .emergency-content {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            animation: slideUp 0.3s ease;
+        }
+
+        .emergency-option {
+            background: #fee2e2;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin: 1rem 0;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        .emergency-option:hover {
+            border-color: var(--danger);
+            transform: translateY(-2px);
+        }
+
+        /* Statistics */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-card {
+            background: var(--light);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 0.5rem 0;
+        }
+
+        /* Therapy Sessions */
+        .session-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .session-item {
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .session-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Medication Tracker */
+        .medication-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .medication-card {
+            background: white;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            border: 2px solid #e5e7eb;
+            transition: var(--transition);
+        }
+
+        .medication-card.taken {
+            border-color: var(--success);
+            background: #f0fdf4;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 4000;
+        }
+
+        .toast {
+            background: white;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            margin-top: 1rem;
+            animation: slideInRight 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            min-width: 300px;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .toast.success {
+            border-left: 4px solid var(--success);
+        }
+
+        .toast.error {
+            border-left: 4px solid var(--danger);
+        }
+
+        .toast.warning {
+            border-left: 4px solid var(--warning);
+        }
+
+        .toast.info {
+            border-left: 4px solid var(--info);
+        }
+
+        /* Loading States */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #e5e7eb;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .mood-scale {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .mood-option {
+                flex-direction: row;
+                justify-content: flex-start;
+                gap: 1rem;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Authentication Screen -->
+    <div class="auth-container active" id="authContainer">
+        <div class="auth-box">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <div class="logo" style="justify-content: center; margin-bottom: 1rem;">
+                    <span>🧠</span>
+                    <span>MindCare</span>
+                </div>
+                <h1 style="margin-bottom: 0.5rem;">Welcome Back</h1>
+                <p style="color: var(--gray);">Sign in to continue your wellness journey</p>
+            </div>
+            
+            <form id="loginForm" style="display: block;">
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Email</label>
+                    <input type="email" id="loginEmail" class="chat-input" placeholder="your@email.com" required style="width: 100%;">
+                </div>
+                
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Password</label>
+                    <input type="password" id="loginPassword" class="chat-input" placeholder="••••••••" required style="width: 100%;">
+                </div>
+                
+                <div style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <input type="checkbox" id="rememberMe">
+                    <label for="rememberMe" style="font-size: 0.875rem;">Remember me</label>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%;" id="loginBtn">
+                    <span>Sign In</span>
+                </button>
+                
+                <div style="text-align: center; margin-top: 1.5rem;">
+                    <p style="color: var(--gray); font-size: 0.875rem;">
+                        Don't have an account? 
+                        <a href="#" onclick="showSignup()" style="color: var(--primary); font-weight: 500; cursor: pointer;">Sign up</a>
+                    </p>
+                </div>
+            </form>
+            
+            <form id="signupForm" style="display: none;">
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Full Name</label>
+                    <input type="text" id="signupName" class="chat-input" placeholder="John Doe" required style="width: 100%;">
+                </div>
+                
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Email</label>
+                    <input type="email" id="signupEmail" class="chat-input" placeholder="your@email.com" required style="width: 100%;">
+                </div>
+                
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Password</label>
+                    <input type="password" id="signupPassword" class="chat-input" placeholder="••••••••" required style="width: 100%;">
+                </div>
+                
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Confirm Password</label>
+                    <input type="password" id="signupConfirmPassword" class="chat-input" placeholder="••••••••" required style="width: 100%;">
+                </div>
+                
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Date of Birth</label>
+                    <input type="date" id="signupDob" class="chat-input" required style="width: 100%;">
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%;" id="signupBtn">
+                    <span>Create Account</span>
+                </button>
+                
+                <div style="text-align: center; margin-top: 1.5rem;">
+                    <p style="color: var(--gray); font-size: 0.875rem;">
+                        Already have an account? 
+                        <a href="#" onclick="showLogin()" style="color: var(--primary); font-weight: 500; cursor: pointer;">Sign in</a>
+                    </p>
+                </div>
+            </form>
+            
+            <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #e5e7eb;">
+                <p style="text-align: center; color: var(--gray); font-size: 0.75rem;">
+                    By continuing, you agree to our 
+                    <a href="#" onclick="showTerms()" style="color: var(--primary); cursor: pointer;">Terms of Service</a> 
+                    and 
+                    <a href="#" onclick="showPrivacy()" style="color: var(--primary); cursor: pointer;">Privacy Policy</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div class="app-container" id="appContainer">
+        <!-- Header -->
+        <header>
+            <nav class="navbar">
+                <div class="logo" onclick="navigateTo('dashboard')">
+                    <span>🧠</span>
+                    <span>MindCare</span>
+                </div>
+                
+                <div class="nav-links">
+                    <div class="nav-link active" onclick="navigateTo('dashboard')">Dashboard</div>
+                    <div class="nav-link" onclick="navigateTo('therapy')">Therapy</div>
+                    <div class="nav-link" onclick="navigateTo('journal')">Journal</div>
+                    <div class="nav-link" onclick="navigateTo('progress')">Progress</div>
+                    <div class="nav-link" onclick="navigateTo('community')">Community</div>
+                    
+                    <div class="user-menu">
+                        <div class="user-avatar" id="userAvatar" onclick="toggleUserMenu()">JD</div>
+                        <div class="user-dropdown" id="userDropdown">
+                            <div class="dropdown-item" onclick="navigateTo('profile')">
+                                <span>👤</span> My Profile
+                            </div>
+                            <div class="dropdown-item" onclick="navigateTo('settings')">
+                                <span>⚙️</span> Settings
+                            </div>
+                            <div class="dropdown-item" onclick="showEmergencyModal()">
+                                <span>🆘</span> Emergency Help
+                            </div>
+                            <div class="dropdown-item" onclick="logout()" style="color: var(--danger);">
+                                <span>🚪</span> Logout
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Main Content Area -->
+        <div class="container">
+            <!-- Dashboard View -->
+            <div id="dashboardView" class="view active">
+                <div class="dashboard-grid">
+                    <!-- Welcome Card -->
+                    <div class="card" style="grid-column: span 12;">
+                        <div class="card-header">
+                            <h2 class="card-title">Welcome, <span id="userName">John</span>! 👋</h2>
+                            <span id="currentDateTime">Loading...</span>
+                        </div>
+                        <p style="color: var(--gray); margin-bottom: 1rem;">
+                            Your mental wellness journey is going strong. Here's your personalized overview.
+                        </p>
+                        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="startDailyCheckin()">
+                                <span>📝</span> Daily Check-in
+                            </button>
+                            <button class="btn btn-outline" onclick="startBreathingExercise()">
+                                <span>🌬️</span> Quick Breathing
+                            </button>
+                            <button class="btn btn-outline" onclick="openJournal()">
+                                <span>📓</span> Write Journal
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Mood Tracker -->
+                    <div class="card" style="grid-column: span 4;">
+                        <div class="card-header">
+                            <h2 class="card-title">Mood Tracker</h2>
+                            <span style="color: var(--gray); font-size: 0.875rem;">Today</span>
+                        </div>
+                        <p style="color: var(--gray); margin-bottom: 1rem;">How are you feeling right now?</p>
+                        
+                        <div class="mood-scale">
+                            <div class="mood-option" data-value="1" onclick="trackMood(1)">
+                                <span class="mood-emoji">😢</span>
+                                <span>Struggling</span>
+                            </div>
+                            <div class="mood-option" data-value="2" onclick="trackMood(2)">
+                                <span class="mood-emoji">😔</span>
+                                <span>Low</span>
+                            </div>
+                            <div class="mood-option" data-value="3" onclick="trackMood(3)">
+                                <span class="mood-emoji">😐</span>
+                                <span>Neutral</span>
+                            </div>
+                            <div class="mood-option" data-value="4" onclick="trackMood(4)">
+                                <span class="mood-emoji">🙂</span>
+                                <span>Good</span>
+                            </div>
+                            <div class="mood-option" data-value="5" onclick="trackMood(5)">
+                                <span class="mood-emoji">😊</span>
+                                <span>Great</span>
+                            </div>
+                        </div>
+                        
+                        <div id="moodInsight" style="background: var(--light); padding: 1rem; border-radius: var(--border-radius); margin-top: 1rem;">
+                            <strong>💡 AI Insight:</strong> Track your mood to see patterns and insights.
+                        </div>
+                        
+                        <div style="margin-top: 1rem;">
+                            <button class="btn btn-outline" onclick="viewMoodHistory()" style="width: 100%;">
+                                <span>📊</span> View History
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- AI Chat Assistant -->
+                    <div class="card" style="grid-column: span 5;">
+                        <div class="card-header">
+                            <h2 class="card-title">AI Wellness Assistant</h2>
+                            <span style="color: var(--success); font-size: 0.875rem;">● Online</span>
+                        </div>
+                        
+                        <div class="chat-container" id="chatMessages">
+                            <!-- Messages will be inserted here -->
+                        </div>
+                        
+                        <div class="chat-input-area">
+                            <input type="text" class="chat-input" id="chatInput" placeholder="Type your message..." onkeypress="handleChatKeypress(event)">
+                            <button class="btn btn-primary" onclick="sendMessage()">
+                                <span>Send</span>
+                            </button>
+                        </div>
+                        
+                        <div style="display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap;">
+                            <button class="btn" style="background: var(--light);" onclick="quickChatMessage('I need help with anxiety')">
+                                Anxiety Help
+                            </button>
+                            <button class="btn" style="background: var(--light);" onclick="quickChatMessage('Suggest a meditation')">
+                                Meditation
+                            </button>
+                            <button class="btn" style="background: var(--light);" onclick="quickChatMessage('Help me sleep better')">
+                                Sleep Better
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Quick Stats -->
+                    <div class="card" style="grid-column: span 3;">
+                        <div class="card-header">
+                            <h2 class="card-title">Weekly Stats</h2>
+                        </div>
+                        
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div style="font-size: 0.875rem; color: var(--gray);">Mood Avg</div>
+                                <div class="stat-value" id="moodAvg">4.2</div>
+                                <div style="font-size: 0.75rem; color: var(--success);">↑ 0.5</div>
+                            </div>
+                            
+                            <div class="stat-card">
+                                <div style="font-size: 0.875rem; color: var(--gray);">Meditation</div>
+                                <div class="stat-value" id="meditationTime">85m</div>
+                                <div style="font-size: 0.75rem; color: var(--success);">+15m</div>
+                            </div>
+                            
+                            <div class="stat-card">
+                                <div style="font-size: 0.875rem; color: var(--gray);">Journal</div>
+                                <div class="stat-value" id="journalEntries">7</div>
+                                <div style="font-size: 0.75rem; color: var(--success);">+2</div>
+                            </div>
+                            
+                            <div class="stat-card">
+                                <div style="font-size: 0.875rem; color: var(--gray);">Streak</div>
+                                <div class="stat-value" id="currentStreak">14</div>
+                                <div style="font-size: 0.75rem; color: var(--success);">🔥</div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 1.5rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span>Weekly Goal Progress</span>
+                                <span>65%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 65%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Exercises -->
+                    <div class="card" style="grid-column: span 6;">
+                        <div class="card-header">
+                            <h2 class="card-title">Quick Wellness Exercises</h2>
+                        </div>
+                        
+                        <div class="exercises-grid">
+                            <div class="exercise-card" onclick="startExercise('breathing')">
+                                <div class="exercise-icon">🌬️</div>
+                                <h3>Deep Breathing</h3>
+                                <p style="color: var(--gray); font-size: 0.875rem; margin-top: 0.5rem;">
+                                    5 mins • Calming
+                                </p>
+                            </div>
+                            
+                            <div class="exercise-card" onclick="startExercise('meditation')">
+                                <div class="exercise-icon">🧘</div>
+                                <h3>Guided Meditation</h3>
+                                <p style="color: var(--gray); font-size: 0.875rem; margin-top: 0.5rem;">
+                                    10 mins • Focus
+                                </p>
+                            </div>
+                            
+                            <div class="exercise-card" onclick="startExercise('gratitude')">
+                                <div class="exercise-icon">🙏</div>
+                                <h3>Gratitude Practice</h3>
+                                <p style="color: var(--gray); font-size: 0.875rem; margin-top: 0.5rem;">
+                                    3 mins • Positive
+                                </p>
+                            </div>
+                            
+                            <div class="exercise-card" onclick="startExercise('body-scan')">
+                                <div class="exercise-icon">👁️</div>
+                                <h3>Body Scan</h3>
+                                <p style="color: var(--gray); font-size: 0.875rem; margin-top: 0.5rem;">
+                                    7 mins • Relaxing
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Journal -->
+                    <div class="card" style="grid-column: span 6;">
+                        <div class="card-header">
+                            <h2 class="card-title">Recent Journal Entries</h2>
+                            <button class="btn btn-outline" onclick="openJournal()" style="padding: 0.5rem 1rem;">
+                                <span>+ New</span>
+                            </button>
+                        </div>
+                        
+                        <div id="journalPreview" style="color: var(--gray); font-style: italic;">
+                            Loading your recent entries...
+                        </div>
+                    </div>
+
+                    <!-- Breathing Exercise Modal -->
+                    <div class="breathing-exercise" id="breathingExercise">
+                        <div class="card" style="max-width: 400px; margin: 0 auto;">
+                            <div class="card-header">
+                                <h2 class="card-title">Deep Breathing Exercise</h2>
+                                <button class="btn btn-outline" onclick="stopBreathingExercise()" style="padding: 0.5rem 1rem;">
+                                    <span>✕</span>
+                                </button>
+                            </div>
+                            
+                            <div style="text-align: center; padding: 2rem 0;">
+                                <p style="color: var(--gray); margin-bottom: 1rem;">
+                                    Follow the circle: Breathe in as it expands, breathe out as it contracts.
+                                </p>
+                                <div class="breath-circle" id="breathCircle">
+                                    Breathe In
+                                </div>
+                                <p id="breathInstruction" style="margin-top: 1rem; font-weight: 500; color: var(--primary);">
+                                    Get ready to begin...
+                                </p>
+                                <div style="margin-top: 2rem;">
+                                    <button class="btn btn-primary" onclick="startBreathingCycle()" id="breathStartBtn">
+                                        <span>Start Exercise</span>
+                                    </button>
+                                    <button class="btn btn-outline" onclick="pauseBreathing()" id="breathPauseBtn" style="display: none;">
+                                        <span>⏸️ Pause</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Therapy View -->
+            <div id="therapyView" class="view" style="display: none;">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Therapy Sessions</h2>
+                        <button class="btn btn-primary" onclick="scheduleSession()">
+                            <span>+</span> Schedule Session
+                        </button>
+                    </div>
+                    
+                    <div class="session-list" id="sessionList">
+                        <!-- Sessions will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Journal View -->
+            <div id="journalView" class="view" style="display: none;">
+                <div class="dashboard-grid">
+                    <div class="card" style="grid-column: span 8;">
+                        <div class="card-header">
+                            <h2 class="card-title">Daily Journal</h2>
+                            <div>
+                                <button class="btn btn-outline" onclick="saveJournalEntry()" style="margin-right: 0.5rem;">
+                                    <span>💾</span> Save
+                                </button>
+                                <button class="btn btn-primary" onclick="analyzeJournalWithAI()">
+                                    <span>🤖</span> AI Analysis
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <input type="text" class="chat-input" id="journalTitle" placeholder="Journal Title" style="width: 100%; margin-bottom: 1rem;">
+                            <textarea class="journal-editor" id="journalContent" placeholder="Write your thoughts, feelings, or experiences here..."></textarea>
+                        </div>
+                        
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            <button class="btn" style="background: var(--light);" onclick="loadJournalPrompt()">
+                                <span>💡</span> Get Prompt
+                            </button>
+                            <button class="btn" style="background: var(--light);" onclick="addGratitudeEntry()">
+                                <span>🙏</span> Gratitude
+                            </button>
+                            <button class="btn" style="background: var(--light);" onclick="addAchievementEntry()">
+                                <span>🎯</span> Achievement
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="card" style="grid-column: span 4;">
+                        <div class="card-header">
+                            <h2 class="card-title">Journal Insights</h2>
+                        </div>
+                        
+                        <div id="journalInsights" style="color: var(--gray);">
+                            Write in your journal to see AI-powered insights about your thoughts and patterns.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress View -->
+            <div id="progressView" class="view" style="display: none;">
+                <div class="dashboard-grid">
+                    <div class="card" style="grid-column: span 12;">
+                        <div class="card-header">
+                            <h2 class="card-title">Progress Analytics</h2>
+                            <select class="chat-input" id="timeRange" style="width: auto;" onchange="updateProgressChart()">
+                                <option value="week">This Week</option>
+                                <option value="month">This Month</option>
+                                <option value="3months">Last 3 Months</option>
+                                <option value="year">This Year</option>
+                            </select>
+                        </div>
+                        
+                        <div style="height: 300px; display: flex; align-items: flex-end; gap: 10px; padding: 2rem; border-bottom: 1px solid #e5e7eb;">
+                            <div id="moodChart" style="display: flex; align-items: flex-end; gap: 10px; flex: 1;">
+                                <!-- Mood chart bars will be generated here -->
+                            </div>
+                        </div>
+                        
+                        <div style="padding: 1.5rem;">
+                            <h3 style="margin-bottom: 1rem;">AI Analysis</h3>
+                            <div id="progressAnalysis" style="color: var(--gray);">
+                                Loading your progress analysis...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Emergency Modal -->
+        <div class="emergency-modal" id="emergencyModal">
+            <div class="emergency-content">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🆘</div>
+                    <h2 style="color: var(--danger);">Emergency Support</h2>
+                    <p style="color: var(--gray); margin-top: 0.5rem;">
+                        Immediate help is available 24/7
+                    </p>
+                </div>
+                
+                <div class="emergency-option" onclick="callEmergency('988')">
+                    <div style="font-weight: 600; margin-bottom: 0.25rem;">National Suicide Prevention Lifeline</div>
+                    <div>Call <strong>988</strong> (24/7, free, confidential)</div>
+                </div>
+                
+                <div class="emergency-option" onclick="textEmergency('741741')">
+                    <div style="font-weight: 600; margin-bottom: 0.25rem;">Crisis Text Line</div>
+                    <div>Text <strong>HOME to 741741</strong></div>
+                </div>
+                
+                <div class="emergency-option" onclick="showLocalResources()">
+                    <div style="font-weight: 600; margin-bottom: 0.25rem;">Local Emergency Services</div>
+                    <div>Call <strong>911</strong> or go to nearest emergency room</div>
+                </div>
+                
+                <div class="emergency-option" onclick="showEmergencyContacts()">
+                    <div style="font-weight: 600; margin-bottom: 0.25rem;">Your Emergency Contacts</div>
+                    <div>Quick access to your trusted contacts</div>
+                </div>
+                
+                <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+                    <button class="btn btn-danger" onclick="simulateEmergencyCall()" style="flex: 1;">
+                        <span>📞</span> Emergency Call
+                    </button>
+                    <button class="btn btn-outline" onclick="hideEmergencyModal()" style="flex: 1;">
+                        Close
+                    </button>
+                </div>
+                
+                <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #e5e7eb;">
+                    <p style="font-size: 0.75rem; color: var(--gray); text-align: center;">
+                        You are not alone. Help is available, and recovery is possible.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Container -->
+        <div class="toast-container" id="toastContainer"></div>
+    </div>
+
+    <script>
+        // ==================== STATE MANAGEMENT ====================
+        let currentUser = null;
+        let userData = {
+            name: "John Doe",
+            email: "john@example.com",
+            moodHistory: [],
+            journalEntries: [],
+            therapySessions: [],
+            exercisesCompleted: 0,
+            currentStreak: 14,
+            settings: {
+                notifications: true,
+                theme: 'light',
+                emergencyContacts: []
+            }
+        };
+
+        let isAuthenticated = false;
+        let currentView = 'dashboard';
+        let aiContext = [];
+        let breathingInterval = null;
+        let isBreathingActive = false;
+
+        // ==================== AUTHENTICATION ====================
+        function showSignup() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('signupForm').style.display = 'block';
+        }
+
+        function showLogin() {
+            document.getElementById('signupForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        }
+
+        function showTerms() {
+            alert('Terms of Service:\n\nThis platform provides supportive tools and is not a substitute for professional medical advice. All data is encrypted and stored securely in compliance with HIPAA regulations.');
+        }
+
+        function showPrivacy() {
+            alert('Privacy Policy:\n\nYour data is encrypted end-to-end. We never share your personal information with third parties without explicit consent. You have full control over your data and can delete it at any time.');
+        }
+
+        function login(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            // Show loading state
+            const loginBtn = document.getElementById('loginBtn');
+            loginBtn.innerHTML = '<div class="loading"></div>';
+            
+            // Simulate API call delay
+            setTimeout(() => {
+                if (email && password) {
+                    // Simulate successful login
+                    currentUser = {
+                        name: email.split('@')[0],
+                        email: email
+                    };
+                    
+                    // Load user data from localStorage or use default
+                    const savedData = localStorage.getItem(`mindcare_user_${email}`);
+                    if (savedData) {
+                        userData = JSON.parse(savedData);
+                    }
+                    
+                    isAuthenticated = true;
+                    
+                    // Show success toast
+                    showToast('Login successful! Welcome back.', 'success');
+                    
+                    // Switch to app
+                    document.getElementById('authContainer').classList.remove('active');
+                    document.getElementById('appContainer').classList.add('active');
+                    
+                    // Initialize app
+                    initializeApp();
+                } else {
+                    showToast('Please fill in all fields', 'error');
+                    loginBtn.innerHTML = '<span>Sign In</span>';
+                }
+            }, 1500);
+        }
+
+        function signup(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('signupConfirmPassword').value;
+            const dob = document.getElementById('signupDob').value;
+            
+            if (password !== confirmPassword) {
+                showToast('Passwords do not match', 'error');
+                return;
+            }
+            
+            if (!name || !email || !password || !dob) {
+                showToast('Please fill in all fields', 'error');
+                return;
+            }
+            
+            // Show loading state
+            const signupBtn = document.getElementById('signupBtn');
+            signupBtn.innerHTML = '<div class="loading"></div>';
+            
+            setTimeout(() => {
+                // Create new user
+                currentUser = {
+                    name: name,
+                    email: email,
+                    dob: dob
+                };
+                
+                // Initialize user data
+                userData = {
+                    name: name,
+                    email: email,
+                    moodHistory: [],
+                    journalEntries: [],
+                    therapySessions: [],
+                    exercisesCompleted: 0,
+                    currentStreak: 1,
+                    settings: {
+                        notifications: true,
+                        theme: 'light',
+                        emergencyContacts: []
+                    }
+                };
+                
+                // Save to localStorage
+                localStorage.setItem(`mindcare_user_${email}`, JSON.stringify(userData));
+                
+                isAuthenticated = true;
+                
+                showToast('Account created successfully!', 'success');
+                
+                // Switch to app
+                document.getElementById('authContainer').classList.remove('active');
+                document.getElementById('appContainer').classList.add('active');
+                
+                // Initialize app
+                initializeApp();
+            }, 2000);
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                isAuthenticated = false;
+                currentUser = null;
+                
+                // Save current data
+                if (currentUser) {
+                    localStorage.setItem(`mindcare_user_${currentUser.email}`, JSON.stringify(userData));
+                }
+                
+                // Reset forms
+                document.getElementById('loginForm').reset();
+                document.getElementById('signupForm').reset();
+                
+                // Switch to auth screen
+                document.getElementById('appContainer').classList.remove('active');
+                document.getElementById('authContainer').classList.add('active');
+                showLogin();
+                
+                showToast('Logged out successfully', 'info');
+            }
+        }
+
+        // ==================== APP INITIALIZATION ====================
+        function initializeApp() {
+            // Update UI with user data
+            document.getElementById('userName').textContent = userData.name.split(' ')[0];
+            document.getElementById('userAvatar').textContent = userData.name.split(' ').map(n => n[0]).join('');
+            
+            // Load mood history
+            updateMoodDisplay();
+            
+            // Load journal preview
+            updateJournalPreview();
+            
+            // Load therapy sessions
+            loadTherapySessions();
+            
+            // Initialize AI chat
+            initializeAIChat();
+            
+            // Start clock
+            updateDateTime();
+            setInterval(updateDateTime, 60000);
+            
+            // Generate progress chart
+            generateProgressChart();
+        }
+
+        function updateDateTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            document.getElementById('currentDateTime').textContent = now.toLocaleDateString('en-US', options);
+        }
+
+        // ==================== NAVIGATION ====================
+        function navigateTo(view) {
+            // Hide all views
+            document.querySelectorAll('.view').forEach(v => {
+                v.style.display = 'none';
+                v.classList.remove('active');
+            });
+            
+            // Update nav links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // Show selected view
+            document.getElementById(`${view}View`).style.display = 'block';
+            document.getElementById(`${view}View`).classList.add('active');
+            
+            // Update active nav link
+            document.querySelector(`.nav-link[onclick="navigateTo('${view}')"]`).classList.add('active');
+            
+            // Update current view
+            currentView = view;
+            
+            // Special initialization for views
+            if (view === 'progress') {
+                generateProgressChart();
+            }
+        }
+
+        function toggleUserMenu() {
+            document.getElementById('userDropdown').classList.toggle('active');
+        }
+
+        // Close user menu when clicking outside
+        document.addEventListener('click', (event) => {
+            if (!event.target.closest('.user-menu')) {
+                document.getElementById('userDropdown').classList.remove('active');
+            }
+        });
+
+        // ==================== MOOD TRACKING ====================
+        function trackMood(level) {
+            // Update UI
+            document.querySelectorAll('.mood-option').forEach(option => {
+                option.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Save mood
+            const moodEntry = {
+                level: level,
+                timestamp: new Date().toISOString(),
+                notes: ''
+            };
+            
+            userData.moodHistory.push(moodEntry);
+            
+            // Update mood average
+            updateMoodStats();
+            
+            // Generate insight
+            const insights = [
+                "I notice you're struggling. Would you like to talk about what's difficult?",
+                "It's okay to have low days. Remember to be gentle with yourself.",
+                "Thanks for checking in. Mindfulness can help enhance your neutral state.",
+                "Great to see you're feeling good! What's contributing to your positive mood?",
+                "Excellent! Your positive energy can inspire others."
+            ];
+            
+            const insight = insights[level - 1];
+            document.getElementById('moodInsight').innerHTML = `<strong>💡 AI Insight:</strong> ${insight}`;
+            
+            // Save data
+            saveUserData();
+            
+            showToast('Mood recorded successfully!', 'success');
+            
+            // Update AI context
+            aiContext.push(`User reported mood level ${level}/5`);
+        }
+
+        function updateMoodDisplay() {
+            if (userData.moodHistory.length > 0) {
+                const lastMood = userData.moodHistory[userData.moodHistory.length - 1];
+                document.querySelector(`.mood-option[data-value="${lastMood.level}"]`).classList.add('active');
+                
+                const insights = [
+                    "I notice you're struggling. Would you like to talk about what's difficult?",
+                    "It's okay to have low days. Remember to be gentle with yourself.",
+                    "Thanks for checking in. Mindfulness can help enhance your neutral state.",
+                    "Great to see you're feeling good! What's contributing to your positive mood?",
+                    "Excellent! Your positive energy can inspire others."
+                ];
+                
+                document.getElementById('moodInsight').innerHTML = `<strong>💡 AI Insight:</strong> ${insights[lastMood.level - 1]}`;
+            }
+        }
+
+        function updateMoodStats() {
+            if (userData.moodHistory.length > 0) {
+                const recentMoods = userData.moodHistory.slice(-7);
+                const avg = recentMoods.reduce((sum, mood) => sum + mood.level, 0) / recentMoods.length;
+                document.getElementById('moodAvg').textContent = avg.toFixed(1);
+                
+                // Update streak if mood >= 3
+                const today = new Date().toDateString();
+                const lastEntry = userData.moodHistory[userData.moodHistory.length - 1];
+                const lastDate = new Date(lastEntry.timestamp).toDateString();
+                
+                if (lastDate === today && lastEntry.level >= 3) {
+                    userData.currentStreak++;
+                    document.getElementById('currentStreak').textContent = userData.currentStreak;
+                }
+            }
+        }
+
+        function viewMoodHistory() {
+            if (userData.moodHistory.length === 0) {
+                alert('No mood history yet. Start tracking your mood daily!');
+                return;
+            }
+            
+            let historyText = 'Your Mood History:\n\n';
+            userData.moodHistory.forEach((entry, index) => {
+                const date = new Date(entry.timestamp).toLocaleDateString();
+                const emoji = ['😢', '😔', '😐', '🙂', '😊'][entry.level - 1];
+                historyText += `${date}: ${emoji} (Level ${entry.level}/5)\n`;
+            });
+            
+            alert(historyText);
+        }
+
+        // ==================== AI CHAT ASSISTANT ====================
+        function initializeAIChat() {
+            const chatContainer = document.getElementById('chatMessages');
+            
+            // Clear container
+            chatContainer.innerHTML = '';
+            
+            // Add welcome message
+            addMessage('ai', 'Hello! I\'m your AI wellness assistant. I\'m here to support you on your mental health journey. How can I help you today?');
+            
+            // Add some initial context
+            aiContext = [
+                'User is on a mental wellness journey',
+                'Platform provides mood tracking, journaling, and exercises'
+            ];
+        }
+
+        function addMessage(sender, text) {
+            const chatContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = sender === 'user' ? userData.name.split(' ').map(n => n[0]).join('') : 'AI';
+            
+            const content = document.createElement('div');
+            content.className = 'message-content';
+            content.textContent = text;
+            
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(content);
+            chatContainer.appendChild(messageDiv);
+            
+            // Scroll to bottom
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Add user message
+            addMessage('user', message);
+            
+            // Clear input
+            input.value = '';
+            
+            // Add to context
+            aiContext.push(`User: ${message}`);
+            
+            // Show typing indicator
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message ai';
+            typingDiv.innerHTML = `
+                <div class="message-avatar">AI</div>
+                <div class="message-content">
+                    <div class="loading" style="width: 16px; height: 16px; border-width: 2px;"></div>
+                </div>
+            `;
+            document.getElementById('chatMessages').appendChild(typingDiv);
+            
+            // Simulate AI thinking
+            setTimeout(() => {
+                // Remove typing indicator
+                typingDiv.remove();
+                
+                // Generate AI response
+                const response = generateAIResponse(message);
+                addMessage('ai', response);
+                
+                // Add to context
+                aiContext.push(`AI: ${response}`);
+            }, 1500 + Math.random() * 1000);
+        }
+
+        function handleChatKeypress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function quickChatMessage(text) {
+            document.getElementById('chatInput').value = text;
+            sendMessage();
+        }
+
+        function generateAIResponse(message) {
+            const lowerMessage = message.toLowerCase();
+            
+            // Context-based responses
+            const responses = {
+                // Greetings
+                'hello': "Hello! How are you feeling today?",
+                'hi': "Hi there! I'm here to support you. What's on your mind?",
+                
+                // Mood-related
+                'sad': "I'm sorry to hear you're feeling sad. Would you like to talk about what's bothering you, or try a quick uplifting exercise?",
+                'anxious': "Anxiety can be challenging. Let's try some grounding techniques together. Would you like to do a breathing exercise?",
+                'stressed': "Stress is tough to manage. I can suggest some relaxation techniques or we can explore what's causing the stress.",
+                'happy': "That's wonderful to hear! What's contributing to your happiness today?",
+                
+                // Exercise requests
+                'breathing': "Great choice! Let me guide you through a calming breathing exercise. Are you ready to begin?",
+                'meditation': "Meditation can be very helpful. Would you like a guided meditation for stress, sleep, or focus?",
+                'exercise': "Physical activity can boost your mood! Would you like some gentle exercise suggestions?",
+                
+                // Sleep-related
+                'sleep': "Sleep is crucial for mental health. I can suggest some sleep hygiene tips or a bedtime meditation.",
+                'insomnia': "Difficulty sleeping can be tough. Let's try a relaxation exercise or explore what might be keeping you awake.",
+                
+                // General support
+                'help': "I'm here to help. You can track your mood, write in your journal, do exercises, or just talk. What would be most helpful right now?",
+                'talk': "I'm listening. Please share what's on your mind.",
+                'advice': "I can offer suggestions based on mental wellness best practices. What specific area would you like advice on?"
+            };
+            
+            // Check for keyword matches
+            for (const [keyword, response] of Object.entries(responses)) {
+                if (lowerMessage.includes(keyword)) {
+                    return response;
+                }
+            }
+            
+            // Default responses
+            const defaultResponses = [
+                "I understand. Can you tell me more about how that's affecting you?",
+                "Thank you for sharing. How long have you been feeling this way?",
+                "That sounds challenging. What's one small thing that might help right now?",
+                "I hear you. Let's work through this together.",
+                "Would you like to try a coping strategy for that feeling?",
+                "How about we try a quick mindfulness exercise to help with that?",
+                "Remember to be kind to yourself. Progress takes time.",
+                "Would it help to write about this in your journal?",
+                "Based on your mood patterns, I suggest trying a gratitude exercise.",
+                "Let's break this down into manageable steps."
+            ];
+            
+            return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
+        }
+
+        // ==================== JOURNAL ====================
+        function openJournal() {
+            navigateTo('journal');
+        }
+
+        function saveJournalEntry() {
+            const title = document.getElementById('journalTitle').value || 'Untitled Entry';
+            const content = document.getElementById('journalContent').value;
+            
+            if (!content.trim()) {
+                showToast('Please write something before saving', 'warning');
+                return;
+            }
+            
+            const entry = {
+                id: Date.now(),
+                title: title,
+                content: content,
+                timestamp: new Date().toISOString(),
+                wordCount: content.split(/\s+/).length
+            };
+            
+            userData.journalEntries.push(entry);
+            
+            // Update stats
+            document.getElementById('journalEntries').textContent = userData.journalEntries.length;
+            
+            // Save data
+            saveUserData();
+            
+            // Clear editor
+            document.getElementById('journalTitle').value = '';
+            document.getElementById('journalContent').value = '';
+            
+            showToast('Journal entry saved!', 'success');
+            
+            // Update preview
+            updateJournalPreview();
+        }
+
+        function analyzeJournalWithAI() {
+            const content = document.getElementById('journalContent').value;
+            
+            if (!content.trim()) {
+                showToast('Please write something to analyze', 'warning');
+                return;
+            }
+            
+            // Show loading
+            const insightsDiv = document.getElementById('journalInsights');
+            insightsDiv.innerHTML = '<div class="loading"></div> Analyzing...';
+            
+            setTimeout(() => {
+                // Simple sentiment analysis
+                const positiveWords = ['happy', 'good', 'great', 'excited', 'proud', 'grateful', 'love', 'peaceful'];
+                const negativeWords = ['sad', 'angry', 'anxious', 'stressed', 'worried', 'tired', 'hurt', 'pain'];
+                
+                let positiveCount = 0;
+                let negativeCount = 0;
+                
+                const words = content.toLowerCase().split(/\s+/);
+                words.forEach(word => {
+                    if (positiveWords.includes(word)) positiveCount++;
+                    if (negativeWords.includes(word)) negativeCount++;
+                });
+                
+                // Generate insights
+                let insights = '<strong>📊 AI Analysis:</strong><br><br>';
+                
+                if (positiveCount > negativeCount) {
+                    insights += 'Overall positive sentiment detected. ';
+                } else if (negativeCount > positiveCount) {
+                    insights += 'Some difficult emotions detected. ';
+                } else {
+                    insights += 'Balanced emotional tone detected. ';
+                }
+                
+                insights += `Found ${positiveCount} positive and ${negativeCount} negative words.<br><br>`;
+                
+                // Topic suggestions
+                if (content.includes('work') || content.includes('job')) {
+                    insights += '💼 Work-related stress detected. Consider work-life balance exercises.';
+                } else if (content.includes('sleep') || content.includes('tired')) {
+                    insights += '😴 Sleep issues mentioned. Try our sleep improvement tools.';
+                } else if (content.includes('friend') || content.includes('family')) {
+                    insights += '👥 Relationship topics identified. Social connections are important for wellbeing.';
+                } else {
+                    insights += '📝 Keep journaling regularly! Writing helps process emotions.';
+                }
+                
+                insightsDiv.innerHTML = insights;
+                
+                showToast('Journal analyzed successfully!', 'success');
+            }, 2000);
+        }
+
+        function loadJournalPrompt() {
+            const prompts = [
+                "What's one thing you're grateful for today?",
+                "Describe a challenge you're facing and how you're handling it.",
+                "Write about a recent accomplishment, no matter how small.",
+                "What does self-care mean to you right now?",
+                "Describe your ideal day for mental wellbeing.",
+                "What emotions have you felt most strongly this week?",
+                "Write a letter to your future self.",
+                "What boundaries do you need to set for your mental health?",
+                "Describe a moment when you felt truly at peace.",
+                "What would you tell a friend who's going through what you're experiencing?"
+            ];
+            
+            const prompt = prompts[Math.floor(Math.random() * prompts.length)];
+            document.getElementById('journalTitle').value = 'Journal Prompt';
+            document.getElementById('journalContent').value = prompt;
+            
+            showToast('Prompt loaded!', 'info');
+        }
+
+        function addGratitudeEntry() {
+            const gratitudes = [
+                "I'm grateful for my health and ability to grow.",
+                "I appreciate the support from loved ones.",
+                "I'm thankful for small moments of joy.",
+                "I value my resilience through challenges.",
+                "I appreciate nature and beauty around me."
+            ];
+            
+            const gratitude = gratitudes[Math.floor(Math.random() * gratitudes.length)];
+            document.getElementById('journalContent').value += '\n\nGratitude: ' + gratitude;
+        }
+
+        function addAchievementEntry() {
+            const achievements = [
+                "Today I practiced self-care by taking breaks.",
+                "I reached out for support when I needed it.",
+                "I acknowledged my feelings without judgment.",
+                "I completed a mindfulness exercise.",
+                "I set healthy boundaries for myself."
+            ];
+            
+            const achievement = achievements[Math.floor(Math.random() * achievements.length)];
+            document.getElementById('journalContent').value += '\n\nAchievement: ' + achievement;
+        }
+
+        function updateJournalPreview() {
+            const previewDiv = document.getElementById('journalPreview');
+            
+            if (userData.journalEntries.length === 0) {
+                previewDiv.innerHTML = 'No journal entries yet. Start writing to track your thoughts and progress.';
+                return;
+            }
+            
+            // Show last 3 entries
+            const recentEntries = userData.journalEntries.slice(-3).reverse();
+            let html = '<div style="display: flex; flex-direction: column; gap: 1rem;">';
+            
+            recentEntries.forEach(entry => {
+                const date = new Date(entry.timestamp).toLocaleDateString();
+                const preview = entry.content.length > 100 ? entry.content.substring(0, 100) + '...' : entry.content;
+                
+                html += `
+                    <div style="padding: 1rem; background: var(--light); border-radius: var(--border-radius);">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <strong>${entry.title}</strong>
+                            <span style="font-size: 0.875rem; color: var(--gray);">${date}</span>
+                        </div>
+                        <p style="font-size: 0.875rem; color: var(--gray);">${preview}</p>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            previewDiv.innerHTML = html;
+        }
+
+        // ==================== EXERCISES ====================
+        function startExercise(type) {
+            const exercises = {
+                'breathing': startBreathingExercise,
+                'meditation': startMeditation,
+                'gratitude': startGratitudePractice,
+                'body-scan': startBodyScan
+            };
+            
+            if (exercises[type]) {
+                exercises[type]();
+            }
+        }
+
+        function startBreathingExercise() {
+            document.getElementById('breathingExercise').classList.add('active');
+        }
+
+        function stopBreathingExercise() {
+            document.getElementById('breathingExercise').classList.remove('active');
+            pauseBreathing();
+        }
+
+        function startBreathingCycle() {
+            const circle = document.getElementById('breathCircle');
+            const instruction = document.getElementById('breathInstruction');
+            const startBtn = document.getElementById('breathStartBtn');
+            const pauseBtn = document.getElementById('breathPauseBtn');
+            
+            startBtn.style.display = 'none';
+            pauseBtn.style.display = 'inline-flex';
+            
+            isBreathingActive = true;
+            let cycle = 0;
+            let isInhale = true;
+            
+            breathingInterval = setInterval(() => {
+                if (isInhale) {
+                    circle.textContent = 'Breathe In';
+                    circle.style.animation = 'breathe 4s ease-in-out infinite';
+                    instruction.textContent = 'Breathe in slowly through your nose...';
+                    instruction.style.color = '#48bb78';
+                } else {
+                    circle.textContent = 'Breathe Out';
+                    circle.style.animation = 'breathe 4s ease-in-out infinite reverse';
+                    instruction.textContent = 'Breathe out slowly through your mouth...';
+                    instruction.style.color = '#667eea';
+                }
+                
+                isInhale = !isInhale;
+                cycle++;
+                
+                if (cycle >= 6) { // 3 complete cycles
+                    completeBreathingExercise();
+                }
+            }, 4000);
+            
+            // Track completion
+            userData.exercisesCompleted++;
+            saveUserData();
+        }
+
+        function pauseBreathing() {
+            if (breathingInterval) {
+                clearInterval(breathingInterval);
+                breathingInterval = null;
+                isBreathingActive = false;
+                
+                const pauseBtn = document.getElementById('breathPauseBtn');
+                const startBtn = document.getElementById('breathStartBtn');
+                
+                pauseBtn.style.display = 'none';
+                startBtn.style.display = 'inline-flex';
+                startBtn.innerHTML = '<span>Resume</span>';
+                
+                document.getElementById('breathInstruction').textContent = 'Paused. Click Resume to continue.';
+                document.getElementById('breathInstruction').style.color = 'var(--gray)';
+            }
+        }
+
+        function completeBreathingExercise() {
+            clearInterval(breathingInterval);
+            breathingInterval = null;
+            isBreathingActive = false;
+            
+            document.getElementById('breathInstruction').textContent = 'Exercise complete! Well done.';
+            document.getElementById('breathInstruction').style.color = 'var(--success)';
+            
+            document.getElementById('breathStartBtn').style.display = 'inline-flex';
+            document.getElementById('breathStartBtn').innerHTML = '<span>Start Again</span>';
+            document.getElementById('breathPauseBtn').style.display = 'none';
+            
+            showToast('Breathing exercise completed! Great job.', 'success');
+        }
+
+        function startMeditation() {
+            alert('Starting guided meditation...\n\nFind a comfortable position. Close your eyes. Focus on your breath. We\'ll begin with 5 minutes of mindfulness.');
+            
+            // Simulate meditation timer
+            let timeLeft = 300; // 5 minutes in seconds
+            
+            const timer = setInterval(() => {
+                timeLeft--;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    showToast('Meditation complete! Notice how you feel.', 'success');
+                    userData.exercisesCompleted++;
+                    saveUserData();
+                }
+            }, 1000);
+        }
+
+        function startGratitudePractice() {
+            const gratitudes = [
+                "What made you smile today?",
+                "Who are you thankful for in your life?",
+                "What ability or skill are you grateful to have?",
+                "What comfort or convenience are you thankful for?",
+                "What beauty did you notice recently?"
+            ];
+            
+            let practice = "Gratitude Practice:\n\n";
+            gratitudes.forEach((q, i) => {
+                practice += `${i + 1}. ${q}\n`;
+            });
+            
+            practice += "\nTake a moment to reflect on each question.";
+            
+            alert(practice);
+            userData.exercisesCompleted++;
+            saveUserData();
+        }
+
+        function startBodyScan() {
+            alert('Starting body scan meditation...\n\nWe\'ll move attention through different parts of your body. Notice sensations without judgment.\n\n1. Start with your feet\n2. Move to your legs\n3. Continue to your torso\n4. Focus on your arms and hands\n5. Finally, your head and face\n\nTake 7 minutes for this practice.');
+            
+            userData.exercisesCompleted++;
+            saveUserData();
+        }
+
+        // ==================== THERAPY SESSIONS ====================
+        function loadTherapySessions() {
+            // Sample sessions if none exist
+            if (userData.therapySessions.length === 0) {
+                userData.therapySessions = [
+                    {
+                        id: 1,
+                        title: 'Weekly Check-in',
+                        therapist: 'Dr. Sarah Miller',
+                        date: new Date(Date.now() + 86400000).toISOString(), // Tomorrow
+                        duration: 50,
+                        type: 'video'
+                    },
+                    {
+                        id: 2,
+                        title: 'Anxiety Management',
+                        therapist: 'Dr. James Wilson',
+                        date: new Date(Date.now() + 604800000).toISOString(), // Next week
+                        duration: 50,
+                        type: 'in-person'
+                    }
+                ];
+            }
+            
+            const sessionList = document.getElementById('sessionList');
+            sessionList.innerHTML = '';
+            
+            userData.therapySessions.forEach(session => {
+                const sessionDiv = document.createElement('div');
+                sessionDiv.className = 'session-item';
+                
+                const date = new Date(session.date);
+                const now = new Date();
+                const isUpcoming = date > now;
+                
+                sessionDiv.innerHTML = `
+                    <div>
+                        <strong>${session.title}</strong>
+                        <div style="font-size: 0.875rem; color: var(--gray);">
+                            with ${session.therapist} • ${session.duration} mins • ${session.type}
+                        </div>
+                    </div>
+                    <div>
+                        <div style="font-weight: 500; margin-bottom: 0.25rem;">
+                            ${date.toLocaleDateString()} at ${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                        </div>
+                        <button class="btn ${isUpcoming ? 'btn-primary' : 'btn-outline'}" onclick="joinSession(${session.id})" style="padding: 0.5rem 1rem;">
+                            ${isUpcoming ? 'Join' : 'Review Notes'}
+                        </button>
+                    </div>
+                `;
+                
+                sessionList.appendChild(sessionDiv);
+            });
+        }
+
+        function scheduleSession() {
+            const title = prompt('Session title:', 'Therapy Session');
+            if (!title) return;
+            
+            const therapist = prompt('Therapist name:', 'Dr. Smith');
+            if (!therapist) return;
+            
+            const dateStr = prompt('Session date (YYYY-MM-DD):', new Date(Date.now() + 86400000).toISOString().split('T')[0]);
+            if (!dateStr) return;
+            
+            const timeStr = prompt('Session time (HH:MM):', '14:00');
+            if (!timeStr) return;
+            
+            const duration = prompt('Duration (minutes):', '50');
+            
+            const newSession = {
+                id: Date.now(),
+                title: title,
+                therapist: therapist,
+                date: new Date(`${dateStr}T${timeStr}`).toISOString(),
+                duration: parseInt(duration) || 50,
+                type: 'video'
+            };
+            
+            userData.therapySessions.push(newSession);
+            loadTherapySessions();
+            saveUserData();
+            
+            showToast('Session scheduled successfully!', 'success');
+        }
+
+        function joinSession(sessionId) {
+            const session = userData.therapySessions.find(s => s.id === sessionId);
+            if (!session) return;
+            
+            const date = new Date(session.date);
+            const now = new Date();
+            
+            if (date > now) {
+                alert(`Your session with ${session.therapist} starts at ${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} on ${date.toLocaleDateString()}.`);
+            } else {
+                alert(`Opening session notes with ${session.therapist}...`);
+            }
+        }
+
+        // ==================== PROGRESS ANALYTICS ====================
+        function generateProgressChart() {
+            const chartDiv = document.getElementById('moodChart');
+            chartDiv.innerHTML = '';
+            
+            // Generate sample data for the last 7 days
+            const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            const data = [];
+            
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                
+                // Use actual mood data if available, otherwise generate sample
+                const moodEntry = userData.moodHistory.find(entry => {
+                    const entryDate = new Date(entry.timestamp).toDateString();
+                    return entryDate === date.toDateString();
+                });
+                
+                data.push({
+                    day: days[date.getDay()],
+                    mood: moodEntry ? moodEntry.level : Math.floor(Math.random() * 3) + 3,
+                    date: date.toDateString()
+                });
+            }
+            
+            // Create bars
+            const maxMood = 5;
+            const barWidth = 40;
+            
+            data.forEach(item => {
+                const barHeight = (item.mood / maxMood) * 200;
+                const bar = document.createElement('div');
+                bar.style.cssText = `
+                    width: ${barWidth}px;
+                    height: ${barHeight}px;
+                    background: linear-gradient(to top, var(--primary), var(--secondary));
+                    border-radius: 8px 8px 0 0;
+                    position: relative;
+                `;
+                
+                bar.innerHTML = `
+                    <div style="position: absolute; bottom: -25px; left: 0; right: 0; text-align: center; font-size: 0.875rem;">
+                        ${item.day}<br>
+                        <strong>${item.mood}/5</strong>
+                    </div>
+                `;
+                
+                chartDiv.appendChild(bar);
+            });
+            
+            // Update analysis
+            updateProgressAnalysis();
+        }
+
+        function updateProgressChart() {
+            generateProgressChart();
+        }
+
+        function updateProgressAnalysis() {
+            const analysisDiv = document.getElementById('progressAnalysis');
+            
+            if (userData.moodHistory.length === 0) {
+                analysisDiv.innerHTML = 'Start tracking your mood to see personalized insights and progress.';
+                return;
+            }
+            
+            // Calculate statistics
+            const recentMoods = userData.moodHistory.slice(-14);
+            const avgMood = recentMoods.reduce((sum, m) => sum + m.level, 0) / recentMoods.length;
+            
+            let analysis = '<strong>📈 Progress Report:</strong><br><br>';
+            
+            if (avgMood >= 4) {
+                analysis += 'Excellent progress! Your mood has been consistently positive. ';
+                analysis += 'Consider what\'s working well and continue those practices.';
+            } else if (avgMood >= 3) {
+                analysis += 'Good stability in your mood patterns. ';
+                analysis += 'Try incorporating one new wellness practice this week.';
+            } else {
+                analysis += 'We notice some challenges in your mood patterns. ';
+                analysis += 'Would you like to explore additional support options?';
+            }
+            
+            analysis += '<br><br><strong>📊 Statistics:</strong><br>';
+            analysis += `• Average Mood: ${avgMood.toFixed(1)}/5<br>`;
+            analysis += `• Journal Entries: ${userData.journalEntries.length}<br>`;
+            analysis += `• Exercises Completed: ${userData.exercisesCompleted}<br>`;
+            analysis += `• Current Streak: ${userData.currentStreak} days<br>`;
+            
+            analysisDiv.innerHTML = analysis;
+        }
+
+        // ==================== EMERGENCY FEATURES ====================
+        function showEmergencyModal() {
+            document.getElementById('emergencyModal').classList.add('active');
+        }
+
+        function hideEmergencyModal() {
+            document.getElementById('emergencyModal').classList.remove('active');
+        }
+
+        function callEmergency(number) {
+            alert(`In a real app, this would call ${number}\n\nFor demonstration: Emergency services would be contacted.`);
+            hideEmergencyModal();
+        }
+
+        function textEmergency(number) {
+            alert(`In a real app, this would text ${number}\n\nFor demonstration: Crisis text line would be accessed.`);
+            hideEmergencyModal();
+        }
+
+        function showLocalResources() {
+            alert('Local Emergency Resources:\n\n• Nearest Hospital: [Would use GPS location]\n• Crisis Centers: [Would show nearby options]\n• Emergency Contacts: [Your saved contacts]');
+        }
+
+        function showEmergencyContacts() {
+            if (userData.settings.emergencyContacts.length === 0) {
+                alert('No emergency contacts saved. Add contacts in Settings.');
+                return;
+            }
+            
+            let contacts = 'Your Emergency Contacts:\n\n';
+            userData.settings.emergencyContacts.forEach((contact, i) => {
+                contacts += `${i + 1}. ${contact.name}: ${contact.phone}\n`;
+            });
+            
+            alert(contacts);
+        }
+
+        function simulateEmergencyCall() {
+            alert('🚨 SIMULATION: Emergency call initiated\n\nIn production, this would:\n1. Call emergency services\n2. Notify your emergency contacts\n3. Share your location\n4. Provide medical information\n\nThis is a demonstration only.');
+            hideEmergencyModal();
+        }
+
+        // ==================== DAILY CHECK-IN ====================
+        function startDailyCheckin() {
+            const questions = [
+                "On a scale of 1-5, how rested do you feel today?",
+                "How would you rate your stress level right now?",
+                "Have you taken any time for self-care today?",
+                "What's one thing you're looking forward to?",
+                "Is there anything specific you'd like support with?"
+            ];
+            
+            let checkin = "Daily Check-in\n\n";
+            questions.forEach((q, i) => {
+                checkin += `${i + 1}. ${q}\n`;
+            });
+            
+            const responses = prompt(checkin + "\nPlease answer each question (separate with commas):");
+            
+            if (responses) {
+                showToast('Daily check-in completed!', 'success');
+                
+                // Update streak
+                userData.currentStreak++;
+                document.getElementById('currentStreak').textContent = userData.currentStreak;
+                
+                saveUserData();
+            }
+        }
+
+        // ==================== UTILITY FUNCTIONS ====================
+        function showToast(message, type = 'info') {
+            const toastContainer = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <div style="font-size: 1.25rem;">
+                    ${type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : '💡'}
+                </div>
+                <div>${message}</div>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                toast.style.animation = 'slideInRight 0.3s ease reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, 5000);
+        }
+
+        function saveUserData() {
+            if (currentUser) {
+                localStorage.setItem(`mindcare_user_${currentUser.email}`, JSON.stringify(userData));
+            }
+        }
+
+        // ==================== EVENT LISTENERS ====================
+        document.getElementById('loginForm').addEventListener('submit', login);
+        document.getElementById('signupForm').addEventListener('submit', signup);
+
+        // Initialize app with demo login for immediate testing
+        window.addEventListener('load', () => {
+            // Auto-login for demo purposes
+            setTimeout(() => {
+                if (!isAuthenticated && window.location.hash !== '#noauto') {
+                    // Demo auto-login
+                    currentUser = {
+                        name: "Demo User",
+                        email: "demo@mindcare.com"
+                    };
+                    
+                    const savedData = localStorage.getItem(`mindcare_user_${currentUser.email}`);
+                    if (savedData) {
+                        userData = JSON.parse(savedData);
+                    }
+                    
+                    isAuthenticated = true;
+                    
+                    document.getElementById('authContainer').classList.remove('active');
+                    document.getElementById('appContainer').classList.add('active');
+                    
+                    initializeApp();
+                    
+                    showToast('Welcome to MindCare Demo! Explore all features.', 'info');
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
